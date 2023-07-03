@@ -3,6 +3,7 @@ import argparse
 import subprocess
 import os
 import sys
+import re
 from datetime import datetime
 from urllib import quote
 
@@ -163,7 +164,7 @@ except OSError:
 def sendemail(content):
     myemail = "wei.xb.wang@nokia-sbell.com,pu.a.zhou@nokia-sbell.com,yaxiang.chen@nokia-sbell.com,yueping.zhou@nokia-sbell.com,heming.a.tang@nokia-sbell.com"
     #myemail = "wei.xb.wang@nokia-sbell.com"
-    subject = "tr069Common branch compile report" + " -- " + currentDate
+    subject = "tr069Common Compile Report (" + args.branch + "/" + args.product + ") -- " + currentDate
     #not support attachment now
     #attachment_paths = ["master_5GGW3-OMNI-1_result.txt", "master_5GGW3-OMNI-1_build_output.txt"]
     
@@ -194,19 +195,38 @@ def sendemail(content):
     #print("stdout:", stdout)
     #print("stderr:", stderr)
 
-if commits and last_commit != commits[0].id:
-    # Update the last checked commit ID
-    with open(LAST_COMMIT_FILE, 'w') as filecommit:
-        filecommit.write(commits[0].id)
-
+def replaceCommitid(commitid):
     # Replace the previous commit ID with the new commit ID in the specific file using sed
     #if new_commits:
     #for commit_id in new_commits:
-    print("Replaced the previous commit ID with the new commit ID in the specific file -- " + commits[0].id)   
-    subprocess.call(['sed', '-i', 's/{}/{}/g'.format(last_commit, commits[0].id), MAKEFILE_FILENAME])
+    print("Replaced the previous commit ID with the new commit ID in the specific file -- " + commitid)
+    #subprocess.call(['sed', '-i', 's/{}/{}/g'.format(last_commit, commits[0].id), MAKEFILE_FILENAME])
+
+    # Read the content of the file
+    make_file = open(MAKEFILE_FILENAME, 'r')
+    content = make_file.read()
+    make_file.close()
+
+    # Replace the desired line
+    pattern = r'PKG_SOURCE_COMMITID = .+'  # Pattern to match " PKG_SOURCE_COMMITID = " followed by any characters
+    new_line = 'PKG_SOURCE_COMMITID = ' +  commitid # New line to replace the matched line
+    print(new_line)
+    modified_content = re.sub(pattern, new_line, content)
+
+    # Write the modified content back to the file
+    make_file = open(MAKEFILE_FILENAME, 'w')
+    make_file.write(modified_content)
+    make_file.close()
+
+if commits and last_commit != commits[0].id:
+    # Update the last checked commit ID
+    #with open(LAST_COMMIT_FILE, 'w') as filecommit:
+    #    filecommit.write(commits[0].id)
+
+    # Replace the previous commit ID with the new commit ID in the specific file using sed
+    replaceCommitid(commits[0].id)
 
     isTerminal = False
-    
     # Example usage: Run a Linux command in a specific directory and check if it succeeded or failed
     command = "make clean"
     print(command)
@@ -246,6 +266,10 @@ if commits and last_commit != commits[0].id:
         sendemail(email_content)
         file.close()
         sys.exit(0)
+
+    # Update the last checked commit ID
+    with open(LAST_COMMIT_FILE, 'w') as filecommit:
+        filecommit.write(commits[0].id)
 
     #run coverity
     command = "DOMAIN=OAM run_coverity.sh " + args.product
