@@ -23,16 +23,28 @@ parser.add_argument('branch', help='Name of the branch to check')
 parser.add_argument('product', help='Name of the product to check')
 args = parser.parse_args()
 
-if args.product == "WNTD4":
-    MAKEFILE_FILENAME = '/weixw_repo/nbn_target/BBDFWA_Appsrc/Mgnt/OAMCore/tr069_ms/Makefile'
-    CURRENT_DIR = '/weixw_repo/nbn_target/BBDFWA_Appsrc/Mgnt/OAMCore/tr069_ms/'
-    COVERITY_DIR = '/weixw_repo/nbn_target/tr069Common/tr069_FWA/' 
-elif args.product == "5GGW3-OMNI-1":
-    MAKEFILE_FILENAME = '/weixw_repo/target_repo/BBDFWA_Appsrc/Mgnt/OAMCore/tr069_ms/Makefile'
-    CURRENT_DIR = '/weixw_repo/target_repo/BBDFWA_Appsrc/Mgnt/OAMCore/tr069_ms/'
-    COVERITY_DIR = '/weixw_repo/target_repo/tr069Common/tr069_FWA/' 
+if args.branch == "master":
+    if args.product == "WNTD4":
+        MAKEFILE_FILENAME = '/weixw_repo/nbn_target/BBDFWA_Appsrc/Mgnt/OAMCore/tr069_ms/Makefile'
+        CURRENT_DIR = '/weixw_repo/nbn_target/BBDFWA_Appsrc/Mgnt/OAMCore/tr069_ms/'
+        COVERITY_DIR = '/weixw_repo/nbn_target/tr069Common/tr069_FWA/' 
+    elif args.product == "5GGW3-OMNI-1":
+        MAKEFILE_FILENAME = '/weixw_repo/target_repo/BBDFWA_Appsrc/Mgnt/OAMCore/tr069_ms/Makefile'
+        CURRENT_DIR = '/weixw_repo/target_repo/BBDFWA_Appsrc/Mgnt/OAMCore/tr069_ms/'
+        COVERITY_DIR = '/weixw_repo/target_repo/tr069Common/tr069_FWA/' 
+    else:
+        print("input invalid product name!(WNTD4/5GGW3-OMNI-1/...)")
+        sys.exit(0)
+elif args.branch == "BBD_R2302":        
+    if args.product == "WNTD4":
+        MAKEFILE_FILENAME = '/weixw_repo/2302_repo/BBDFWA_Appsrc/Mgnt/OAMCore/tr069_ms/Makefile'
+        CURRENT_DIR = '/weixw_repo/2302_repo/BBDFWA_Appsrc/Mgnt/OAMCore/tr069_ms/'
+        COVERITY_DIR = '/weixw_repo/2302_repo/tr069Common/tr069_FWA/' 
+    else:
+        print("input invalid product name!(WNTD4/...)")
+        sys.exit(0)
 else:
-    print("input invalid product name!(WNTD4/5GGW3-OMNI-1/...)")
+    print("input invalid branch name!(master/BBD_R2302/...)")
     sys.exit(0)
 
 print('current project diretory: ' + CURRENT_DIR)
@@ -149,7 +161,7 @@ except OSError:
     pass
 
 def sendemail(content):
-    myemail = "wei.xb.wang@nokia-sbell.com,pu.a.zhou@nokia-sbell.com,yaxiang.chen@nokia-sbell.com,yueping.zhou@nokia-sbell.com"
+    myemail = "wei.xb.wang@nokia-sbell.com,pu.a.zhou@nokia-sbell.com,yaxiang.chen@nokia-sbell.com,yueping.zhou@nokia-sbell.com,heming.a.tang@nokia-sbell.com"
     #myemail = "wei.xb.wang@nokia-sbell.com"
     subject = "tr069Common branch compile report" + " -- " + currentDate
     #not support attachment now

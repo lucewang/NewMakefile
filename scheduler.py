@@ -2,11 +2,14 @@ import time
 import subprocess
 
 def run_script():
-    script_path = "/weixw_repo/oam_branch/tr069Clone/tr_checkcommit.py"
+    script_path = "/weixw_repo/myspace/tr_script/tr_checkcommit.py"
     script_args = ["master","WNTD4"]  # Replace with your desired arguments
     subprocess.call(["python", script_path] + script_args)
     time.sleep(10)
     script_args = ["master","5GGW3-OMNI-1"]  # Replace with your desired arguments
+    subprocess.call(["python", script_path] + script_args)
+    time.sleep(10)
+    script_args = ["BBD_R2302","WNTD4"]  # Replace with your desired arguments
     subprocess.call(["python", script_path] + script_args)
 
 while True:
